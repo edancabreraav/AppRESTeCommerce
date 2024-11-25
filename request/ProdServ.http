@@ -1,0 +1,8 @@
+@api = http://localhost:3020/api/v1/prod-serv
+
+### GET
+GET {{api}}
+### GET ITEM BY OK
+GET {{api}}/9001-000000000001?keyType=OK
+### GET ITEM BY BK
+GET {{api}}/HPZBOOK-COREi7?keyType=BK
