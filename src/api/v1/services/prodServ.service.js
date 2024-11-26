@@ -90,6 +90,36 @@ export const addSubdocumentProdServ = async (id, seccion, newSubDocument) => {
   }
 };
 
+//Método para añadir un subdocumento (estatus[], info_vta[], archivos[]) dentro de un subdocumento presentaciones
+export const addPresentacionSubdocument = async (id, idPresentacion, seccionPresentacion, newPresentacionSubdocument) => {
+  const allowedSections = ['estatus', 'info_vta', 'archivos'];
+  if (!allowedSections.includes(seccionPresentacion)) {
+    return FAIL('Sección de presentación inválida');
+  }
+
+  // Define la consulta para ubicar la presentación
+  const query = {
+    IdProdServOK: id,
+    "presentaciones.IdPresentaOK": idPresentacion
+  };
+
+  // Define el path de la sección a actualizar
+  const pathToAdd = `presentaciones.$.${seccionPresentacion}`;
+
+  try {
+    const addedDocument = await ProdServ.findOneAndUpdate(
+      query,
+      { $push: { [pathToAdd]: newPresentacionSubdocument } },
+      { new: true }
+    );
+
+    return OK("Subdocumento añadido con éxito", addedDocument);
+  } catch (error) {
+    console.error(error);
+    return FAIL("Error al añadir el subdocumento", error);
+  }
+};
+
 //----------PUT----------
 //Método para modificar un producto
 export const putProdServItem = async (id, paProdServItem) => {

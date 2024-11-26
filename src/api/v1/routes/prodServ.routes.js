@@ -17,6 +17,9 @@ router.post("/addMany", prodServController.postManyProdServItems);
 //SUBDOCUMENTOS
 //Ruta para añadir un subdocumento a una sección de producto
 router.post("/:id/:seccion", prodServController.addSubdocumentProdServ);
+//Ruta para añadir un subdocumento (estatus[], info_vta[], archivos[]) dentro de un subdocumento presentaciones
+router.post('/presentaciones/subdocs/:id/:idPresentacion/:seccionPresentacion', prodServController.addPresentacionSubdocument);
+
 
 //----------PUT----------
 //Ruta para modificar un producto
@@ -36,7 +39,7 @@ router.put(
 router.put('/presentaciones/primary/:id/:idPresentacion', prodServController.putPrimaryPresentacion);
 
 //Ruta para modificar un subdocumento (estatus[], info_vta[], archivos[]) que se encuentre dentro de un subdocumento presentaciones
-router.put('/presentaciones/subodcs/:id/:idPresentacion/:seccionPresentacion/:idSeccionPresentacion', prodServController.putPresentacionSubdocument);
+router.put('/presentaciones/subdocs/:id/:idPresentacion/:seccionPresentacion/:idSeccionPresentacion', prodServController.putPresentacionSubdocument);
 
 
 //----------DELETE-----------

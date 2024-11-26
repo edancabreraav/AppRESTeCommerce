@@ -116,6 +116,21 @@ export const addSubdocumentProdServ = async (req, res, next) => {
   }
 };
 
+//Controlador para añadir un subdocumento (estatus[], info_vta[], archivos[]) dentro de un subdocumento presentaciones
+export const addPresentacionSubdocument = async (req, res, next) => {
+  const { id, idPresentacion, seccionPresentacion } = req.params;
+  const data = req.body;
+
+  try {
+    const addedDocument = await ProdServServices.addPresentacionSubdocument(id, idPresentacion, seccionPresentacion, data);
+    res.status(200).json(addedDocument);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+
 //----------FIN DE LOS CONTROLADORES PARA POST----------
 
 //----------PUT-----------
