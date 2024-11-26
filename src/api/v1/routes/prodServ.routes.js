@@ -32,6 +32,9 @@ router.put(
   prodServController.putProdServSubdocument
 );
 
+//Método para modificar el subdocumento PRESENTACIONES sin afectar sus subdocumentos internos {estatus[], info_vta[], archivos[]}
+router.put('/presentaciones/primary/:id/:idPresentacion', prodServController.putPrimaryPresentacion);
+
 //----------DELETE-----------
 //Ruta para eliminar un producto
 router.delete("/:id", prodServController.deleteProdServItem);

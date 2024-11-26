@@ -187,6 +187,21 @@ export const putProdServSubdocument = async (req, res, next) => {
     next(error);
   }
 };
+
+//Método para modificar el subdocumento PRESENTACIONES sin afectar sus subdocumentos internos {estatus[], info_vta[], archivos[]}
+export const putPrimaryPresentacion = async (req, res, next) => {
+  const { id, idPresentacion } = req.params;
+  const data = req.body;
+
+  try {
+    const updatedPresentacion = await ProdServServices.putPrimaryPresentacion(id, idPresentacion, data);
+    res.status(200).json(updatedPresentacion)
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+}
+
 //----------FIN DE LOS CONTROLADORES PARA PUT----------
 
 //----------DELETE----------

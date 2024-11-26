@@ -166,6 +166,29 @@ export const putProdServSubdocument = async (
   }
 };
 
+//Método para modificar el subdocumento PRESENTACIONES sin afectar sus subdocumentos internos {estatus[], info_vta[], archivos[]}
+export const putPrimaryPresentacion = async (id, idPresentacion, data) => {
+  try {
+    const updatedPresentacion = await ProdServ.findOneAndUpdate ({IdProdServOK: id, 'presentaciones.IdPresentaOK': idPresentacion},{
+      $set: {
+        "presentaciones.$.IdPresentaOK": data.IdPresentaOK,
+        "presentaciones.$.IdPresentaBK": data.IdPresentaBK,
+        "presentaciones.$.CodigoBarras": data.CodigoBarras,
+        "presentaciones.$.DesPresenta": data.DesPresenta,
+        "presentaciones.$.Indice": data.Indice,
+        "presentaciones.$.Principal": data.Principal,
+        
+      },
+    }, {new: true});
+    console.log(id)
+    console.log(idPresentacion)
+    console.log(data)
+    return OK("Presentación actualizada con éxito", updatedPresentacion)
+  } catch (error) {
+    return FAIL("No se pudo actualizar la presentación", error)
+  }
+}
+
 //----------DELETE-----------
 //Método para eliminar un producto
 export const deleteProdServItem = async (id) => {
