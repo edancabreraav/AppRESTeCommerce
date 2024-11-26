@@ -315,3 +315,47 @@ export const deleteProdServSubdocument = async (id, seccion, idSeccion) => {
     return FAIL("Error al eliminar el subdocumento", error);
   }
 };
+
+// Método para eliminar un subdocumento (estatus[], info_vta[], archivos[]) dentro de un subdocumento presentaciones
+export const deletePresentacionSubdocument = async (id, idPresentacion, seccionPresentacion, idSubdocument) => {
+  const allowedSections = ['estatus', 'info_vta', 'archivos'];
+  if (!allowedSections.includes(seccionPresentacion)) {
+    return FAIL('Sección de presentación inválida');
+  }
+
+  // Define la consulta para ubicar la presentación
+  const query = {
+    IdProdServOK: id,
+    "presentaciones.IdPresentaOK": idPresentacion
+  };
+  // Define el path de la sección en donde se encuentra el subdocumento a eliminar
+  const pathToUpdate = `presentaciones.$.${seccionPresentacion}`;
+
+  // Construir el filtro para el subdocumento que queremos eliminar
+  let subdocument = {}
+  if (seccionPresentacion === 'estatus') {
+    subdocument = { [`${pathToUpdate}`]: { IdTipoEstatusOK: idSubdocument } };
+  } else if (seccionPresentacion === 'info_vta') {
+    subdocument = { [`${pathToUpdate}`]: { IdEtiquetaOK: idSubdocument } };
+  } else {
+    subdocument = { [`${pathToUpdate}`]: { IdArchivoOK: idSubdocument } };
+  }
+
+  try {
+    const updatedDocument = await ProdServ.findOneAndUpdate(
+      query,
+      { $pull: subdocument },
+      { new: true }
+    );
+
+    if (!updatedDocument) {
+      return FAIL("Producto, presentación o subdocumento no encontrado");
+    }
+
+    return OK("Subdocumento eliminado con éxito", updatedDocument);
+  } catch (error) {
+    console.error(error);
+    return FAIL("Error al eliminar el subdocumento", error);
+  }
+};
+

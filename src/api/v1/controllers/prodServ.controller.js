@@ -269,4 +269,17 @@ export const deleteProdServSubdocument = async (req, res, next) => {
     next(error);
   }
 };
+
+// Controlador para eliminar un subdocumento (estatus[], info_vta[], archivos[]) dentro de un subdocumento presentaciones
+export const deletePresentacionSubdocument = async (req, res, next) => {
+  const { id, idPresentacion, seccionPresentacion, idSubdocument } = req.params;
+  try {
+    const updatedDocument = await ProdServServices.deletePresentacionSubdocument(id, idPresentacion, seccionPresentacion, idSubdocument);
+    res.status(200).json(updatedDocument);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 //----------FIN DE LOS CONTROLADORES PARA DELETE----------

@@ -46,9 +46,10 @@ router.put('/presentaciones/subdocs/:id/:idPresentacion/:seccionPresentacion/:id
 //Ruta para eliminar un producto
 router.delete("/:id", prodServController.deleteProdServItem);
 //Ruta para eliminar un subdocumento a una sección de producto
-router.delete(
-  "/:id/:seccion/:idSeccion",
-  prodServController.deleteProdServSubdocument
+router.delete("/:id/:seccion/:idSeccion", prodServController.deleteProdServSubdocument
 );
+//Ruta para eliminar un subdocumento (estatus[], info_vta[], archivos[]) dentro de un subdocumento presentaciones
+router.delete('/presentaciones/subdocs/:id/:idPresentacion/:seccionPresentacion/:idSubdocument', prodServController.deletePresentacionSubdocument);
+
 
 export default router;
