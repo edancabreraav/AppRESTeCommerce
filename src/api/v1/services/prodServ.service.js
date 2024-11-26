@@ -187,51 +187,6 @@ export const putPrimaryPresentacion = async (id, idPresentacion, data) => {
 }
 
 //Método para modificar un subdocumento (estatus[], info_vta[], archivos[]) que se encuentre dentro de un subdocumento presentaciones
-// export const putPresentacionSubdocument = async (id, idPresentacion, seccionPresentacion, idSeccionPresentacion, data) => {
-//   const allowedSections = ['estatus', 'info_vta', 'archivos'];
-//   if (!allowedSections.includes(seccionPresentacion)){
-//     return FAIL('Sección de presentación inválida');
-//   }
-
-//   let query = {}
-//   let update = {}
-//   if (seccionPresentacion === 'estatus') {
-//     query = {
-//       IdProdServOK: id, 
-//       "presentaciones.IdPresentaOK": idPresentacion,
-//       "presentaciones.estatus.IdTipoEstatusOK": idSeccionPresentacion
-//     }
-//     update = {$set : {[`presentaciones.$.estatus.$`]: data}}
-//   } else if(seccionPresentacion === 'info_vta') {
-//     query = {
-//       IdProdServOK: id, 
-//       "presentaciones.IdPresentaOK": idPresentacion,
-//       "presentaciones.info_vta.IdEtiquetaOK": idSeccionPresentacion
-//     }
-//     update = {$set : {[`presentaciones.$.info_vata.$`]: data}}
-//   } else {
-//     query = {
-//       IdProdServOK: id, 
-//       "presentaciones.IdPresentaOK": idPresentacion,
-//       "presentaciones.archivos.IdArchivoOK": idSeccionPresentacion
-//     }
-//     update = {$set : {[`presentaciones.$.archivos.$`]: data}}
-//   }
-
-  
-//   try {
-//     const updatedSeccion = await ProdServ.findOneAndUpdate(query, update, {new: true})
-
-//     if (!updatedSeccion) {
-//       return FAIL("Producto o subdocumento no encontrado");
-//     }
-
-//     return OK("Subdocumento modificado con éxito", updatedSeccion);
-//   } catch (error) {
-//     console.error(error);
-//     return FAIL("Error al modificar el subdocumento", error);
-//   }
-// }
 export const putPresentacionSubdocument = async (id, idPresentacion, seccionPresentacion, idSeccionPresentacion, data) => {
   const allowedSections = ['estatus', 'info_vta', 'archivos'];
   if (!allowedSections.includes(seccionPresentacion)) {
@@ -247,12 +202,24 @@ export const putPresentacionSubdocument = async (id, idPresentacion, seccionPres
   // Define el path para la sección específica dentro de `presentaciones`
   const pathToUpdate = `presentaciones.$[presentacion].${seccionPresentacion}.$[subdocument]`;
 
-  // Configura los filtros de los arrays
-  const arrayFilters = [
-    { "presentacion.IdPresentaOK": idPresentacion },
-    { [`subdocument.IdTipoEstatusOK`]: idSeccionPresentacion }
-  ];
+  let arrayFilters = []
 
+  if (seccionPresentacion === 'estatus') {
+    // Configura los filtros de los arrays
+    arrayFilters = [
+      { "presentacion.IdPresentaOK": idPresentacion },
+      { [`subdocument.IdTipoEstatusOK`]: idSeccionPresentacion }
+    ];
+  } else if (seccionPresentacion === 'info_vta'){
+    arrayFilters = [
+      { "presentacion.IdPresentaOK": idPresentacion },
+      { [`subdocument.IdEtiquetaOK`]: idSeccionPresentacion }
+    ];
+  }else
+  arrayFilters = [
+    { "presentacion.IdPresentaOK": idPresentacion },
+    { [`subdocument.IdArchivoOK`]: idSeccionPresentacion }
+  ];
   try {
     const updatedSeccion = await ProdServ.findOneAndUpdate(
       query,
@@ -273,8 +240,6 @@ export const putPresentacionSubdocument = async (id, idPresentacion, seccionPres
     return FAIL("Error al modificar el subdocumento", error);
   }
 };
-
-
 
 //----------DELETE-----------
 //Método para eliminar un producto
