@@ -180,14 +180,101 @@ export const putPrimaryPresentacion = async (id, idPresentacion, data) => {
         
       },
     }, {new: true});
-    console.log(id)
-    console.log(idPresentacion)
-    console.log(data)
     return OK("Presentación actualizada con éxito", updatedPresentacion)
   } catch (error) {
     return FAIL("No se pudo actualizar la presentación", error)
   }
 }
+
+//Método para modificar un subdocumento (estatus[], info_vta[], archivos[]) que se encuentre dentro de un subdocumento presentaciones
+// export const putPresentacionSubdocument = async (id, idPresentacion, seccionPresentacion, idSeccionPresentacion, data) => {
+//   const allowedSections = ['estatus', 'info_vta', 'archivos'];
+//   if (!allowedSections.includes(seccionPresentacion)){
+//     return FAIL('Sección de presentación inválida');
+//   }
+
+//   let query = {}
+//   let update = {}
+//   if (seccionPresentacion === 'estatus') {
+//     query = {
+//       IdProdServOK: id, 
+//       "presentaciones.IdPresentaOK": idPresentacion,
+//       "presentaciones.estatus.IdTipoEstatusOK": idSeccionPresentacion
+//     }
+//     update = {$set : {[`presentaciones.$.estatus.$`]: data}}
+//   } else if(seccionPresentacion === 'info_vta') {
+//     query = {
+//       IdProdServOK: id, 
+//       "presentaciones.IdPresentaOK": idPresentacion,
+//       "presentaciones.info_vta.IdEtiquetaOK": idSeccionPresentacion
+//     }
+//     update = {$set : {[`presentaciones.$.info_vata.$`]: data}}
+//   } else {
+//     query = {
+//       IdProdServOK: id, 
+//       "presentaciones.IdPresentaOK": idPresentacion,
+//       "presentaciones.archivos.IdArchivoOK": idSeccionPresentacion
+//     }
+//     update = {$set : {[`presentaciones.$.archivos.$`]: data}}
+//   }
+
+  
+//   try {
+//     const updatedSeccion = await ProdServ.findOneAndUpdate(query, update, {new: true})
+
+//     if (!updatedSeccion) {
+//       return FAIL("Producto o subdocumento no encontrado");
+//     }
+
+//     return OK("Subdocumento modificado con éxito", updatedSeccion);
+//   } catch (error) {
+//     console.error(error);
+//     return FAIL("Error al modificar el subdocumento", error);
+//   }
+// }
+export const putPresentacionSubdocument = async (id, idPresentacion, seccionPresentacion, idSeccionPresentacion, data) => {
+  const allowedSections = ['estatus', 'info_vta', 'archivos'];
+  if (!allowedSections.includes(seccionPresentacion)) {
+    return FAIL('Sección de presentación inválida');
+  }
+
+  // Define la consulta para ubicar la presentación
+  const query = {
+    IdProdServOK: id,
+    "presentaciones.IdPresentaOK": idPresentacion
+  };
+
+  // Define el path para la sección específica dentro de `presentaciones`
+  const pathToUpdate = `presentaciones.$[presentacion].${seccionPresentacion}.$[subdocument]`;
+
+  // Configura los filtros de los arrays
+  const arrayFilters = [
+    { "presentacion.IdPresentaOK": idPresentacion },
+    { [`subdocument.IdTipoEstatusOK`]: idSeccionPresentacion }
+  ];
+
+  try {
+    const updatedSeccion = await ProdServ.findOneAndUpdate(
+      query,
+      { $set: { [pathToUpdate]: data } },
+      {
+        arrayFilters,
+        new: true,
+      }
+    );
+
+    if (!updatedSeccion) {
+      return FAIL("Producto o subdocumento no encontrado");
+    }
+
+    return OK("Subdocumento modificado con éxito", updatedSeccion);
+  } catch (error) {
+    console.error(error);
+    return FAIL("Error al modificar el subdocumento", error);
+  }
+};
+
+
 
 //----------DELETE-----------
 //Método para eliminar un producto

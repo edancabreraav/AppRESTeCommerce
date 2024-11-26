@@ -188,7 +188,7 @@ export const putProdServSubdocument = async (req, res, next) => {
   }
 };
 
-//Método para modificar el subdocumento PRESENTACIONES sin afectar sus subdocumentos internos {estatus[], info_vta[], archivos[]}
+//Controlador para modificar el subdocumento PRESENTACIONES sin afectar sus subdocumentos internos {estatus[], info_vta[], archivos[]}
 export const putPrimaryPresentacion = async (req, res, next) => {
   const { id, idPresentacion } = req.params;
   const data = req.body;
@@ -196,6 +196,20 @@ export const putPrimaryPresentacion = async (req, res, next) => {
   try {
     const updatedPresentacion = await ProdServServices.putPrimaryPresentacion(id, idPresentacion, data);
     res.status(200).json(updatedPresentacion)
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+}
+
+//Controlador para modificar un subdocumento (estatus[], info_vta[], archivos[]) que se encuentre dentro de un subdocumento presentaciones
+export const putPresentacionSubdocument = async (req, res, next) => {
+  const { id, idPresentacion, seccionPresentacion, idSeccionPresentacion } = req.params;
+  const data = req.body;
+
+  try {
+    const updatedPresentacionSeccion = await ProdServServices.putPresentacionSubdocument(id, idPresentacion, seccionPresentacion, idSeccionPresentacion, data);
+    res.status(200).json(updatedPresentacionSeccion)
   } catch (error) {
     console.log(error);
     next(error)
