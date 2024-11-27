@@ -37,7 +37,7 @@ export const getProdServItem = async (id, keyType) => {
 //Método para añadir un producto
 export const postProdServItem = async (paProdServItem) => {
   try {
-    const newProdServItem = new ProdServ(paProdServItem).save();
+    const newProdServItem = await new ProdServ(paProdServItem).save();
     return OK("Producto añadido exitosamente", newProdServItem);
   } catch (error) {
     if (error.code == 11000) {

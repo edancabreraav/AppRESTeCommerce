@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 const prodservSchema = new mongoose.Schema({
     //IdInstitutoOK: { type: String },
-    IdProdServOK: { type: String, required: true },
+    IdProdServOK: { type: String, required: true, unique: true },
     IdProdServBK: { type: String },
     CodigoBarras: { type: String },
     DesProdServ: { type: String },
