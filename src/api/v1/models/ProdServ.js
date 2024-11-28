@@ -8,29 +8,29 @@ const prodservSchema = new mongoose.Schema({
     Indice: { type: String }, 
     estatus: [
         {
-            IdTipoEstatusOK: { type: String, unique: true },
+            IdTipoEstatusOK: { type: String },
             Actual: { type: String },
             Observacion: { type: String }
         }
     ],
     presentaciones: [
         {
-            IdPresentaOK: { type: String, unique: true },
-            IdPresentaBK: { type: String, unique: true },
+            IdPresentaOK: { type: String },
+            IdPresentaBK: { type: String },
             CodigoBarras: { type: String },
             DesPresenta: { type: String },
             Indice: { type: String },
             Principal: { type: String },
             estatus: [
                 {
-                    IdTipoEstatusOK: { type: String, unique: true },
+                    IdTipoEstatusOK: { type: String },
                     Actual: { type: String },
                     Observacion: { type: String },
                 }
             ],
             info_vta: [
                 {
-                    IdEtiquetaOK: { type: String, unique: true },
+                    IdEtiquetaOK: { type: String },
                     IdEtiqueta: { type: String },
                     Valor: { type: String },
                     IdTipoSeccionOK: { type: String },
@@ -39,8 +39,8 @@ const prodservSchema = new mongoose.Schema({
             ],
             archivos: [
                 {
-                    IdArchivoOK: { type: String, unique: true },
-                    IdArchivoBK: { type: String, unique: true },
+                    IdArchivoOK: { type: String },
+                    IdArchivoBK: { type: String },
                     DesArchivo: { type: String },
                     RutaArchivo: { type: String },
                     Path: { type: String },
