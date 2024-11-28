@@ -1,37 +1,36 @@
 import * as mongoose from 'mongoose';
 
 const prodservSchema = new mongoose.Schema({
-    //IdInstitutoOK: { type: String },
     IdProdServOK: { type: String, required: true, unique: true },
-    IdProdServBK: { type: String },
+    IdProdServBK: { type: String, unique: true },
     CodigoBarras: { type: String },
     DesProdServ: { type: String },
     Indice: { type: String }, 
     estatus: [
         {
-            IdTipoEstatusOK: { type: String },
+            IdTipoEstatusOK: { type: String, unique: true },
             Actual: { type: String },
             Observacion: { type: String }
         }
     ],
     presentaciones: [
         {
-            IdPresentaOK: { type: String },
-            IdPresentaBK: { type: String },
+            IdPresentaOK: { type: String, unique: true },
+            IdPresentaBK: { type: String, unique: true },
             CodigoBarras: { type: String },
             DesPresenta: { type: String },
             Indice: { type: String },
             Principal: { type: String },
             estatus: [
                 {
-                    IdTipoEstatusOK: { type: String },
+                    IdTipoEstatusOK: { type: String, unique: true },
                     Actual: { type: String },
                     Observacion: { type: String },
                 }
             ],
             info_vta: [
                 {
-                    IdEtiquetaOK: { type: String },
+                    IdEtiquetaOK: { type: String, unique: true },
                     IdEtiqueta: { type: String },
                     Valor: { type: String },
                     IdTipoSeccionOK: { type: String },
@@ -40,8 +39,8 @@ const prodservSchema = new mongoose.Schema({
             ],
             archivos: [
                 {
-                    IdArchivoOK: { type: String },
-                    IdArchivoBK: { type: String },
+                    IdArchivoOK: { type: String, unique: true },
+                    IdArchivoBK: { type: String, unique: true },
                     DesArchivo: { type: String },
                     RutaArchivo: { type: String },
                     Path: { type: String },
@@ -55,7 +54,7 @@ const prodservSchema = new mongoose.Schema({
     ],
     info_ad: [
         {
-            IdEtiquetaOK: { type: String },
+            IdEtiquetaOK: { type: String, unique: true },
             IdEtiqueta: { type: String },
             Valor: { type: String },
             IdTipoSeccionOK: { type: String },

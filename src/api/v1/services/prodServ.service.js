@@ -43,10 +43,7 @@ export const postProdServItem = async (paProdServItem) => {
     if (error.code == 11000) {
       return FAIL("El producto ya existe", error);
     } else {
-      return FAIL(
-        "No se pudo agregar el proudcto, error en el servidor",
-        error
-      );
+      return FAIL("No se pudo agregar el proudcto, error en el servidor",error);
     }
   }
 };
@@ -72,6 +69,24 @@ export const addSubdocumentProdServ = async (id, seccion, newSubDocument) => {
     return FAIL("Sección inválida");
   }
   try {
+
+    //Primero verficamos que el subodc que intentamos añadir no exista ya en la bd
+    const uniqueField = {
+      estatus: "IdTipoEstatusOK",
+      presentaciones: "IdPresentaOK",
+      info_ad: "IdEtiquetaOK"
+    };
+    const uniqueKey = uniqueField[seccion];
+    // Verificar si ya existe un subdocumento con el mismo identificador
+    const existingProdServ = await ProdServ.findOne({
+      IdProdServOK: id,
+      [`${seccion}.${uniqueKey}`]: newSubDocument[uniqueKey]
+    });
+    if (existingProdServ) {
+      return FAIL("id duplicado, no se realizó la inserción");
+    }
+    //---Fin de la verificación de id duplicada----
+
     // $push para añadir el nuevo subdocumento al arreglo
     const updatedProdServ = await ProdServ.findOneAndUpdate(
       { IdProdServOK: id }, // Busqueda por el IdProdServOK
@@ -85,8 +100,8 @@ export const addSubdocumentProdServ = async (id, seccion, newSubDocument) => {
     }
     return OK("Subdocumento agregado con éxito", updatedProdServ);
   } catch (error) {
-    console.error(error);
-    return FAIL("Error al agregar subdocumento", error);
+      console.error(error);
+      return FAIL("Error al agregar subdocumento", error);
   }
 };
 
@@ -115,8 +130,12 @@ export const addPresentacionSubdocument = async (id, idPresentacion, seccionPres
 
     return OK("Subdocumento añadido con éxito", addedDocument);
   } catch (error) {
-    console.error(error);
-    return FAIL("Error al añadir el subdocumento", error);
+    if (error.code === 11000) {
+      return FAIL ('Clave duplicada', error);
+    } else {
+      console.error(error);
+      return FAIL("Error al añadir el subdocumento", error);
+    }
   }
 };
 
@@ -140,7 +159,15 @@ export const putProdServItem = async (id, paProdServItem) => {
     console.log(updatedProdServItem);
     return OK("Producto modificado con éxito", updatedProdServItem);
   } catch (error) {
-    return FAIL("No se pudo modificar el producto", error);
+    if (error.code == 11000) {
+      return FAIL("Clave repetida, no se pudo modificar el producto", error);
+    } else {
+      if (error.code == 11000) {
+        return FAIL("El producto ya existe", error);
+      } else {
+        return FAIL("No se pudo modificar el proudcto, error en el servidor",error);
+      }
+    }
   }
 };
 
@@ -153,7 +180,11 @@ export const putPrimaryProdServ = async (id, data) => {
       {new: true});
     return OK("Producto modificado con éxito", updatedPrimaryProdServ);
   } catch (error) {
-    return FAIL("No se pudo modificar el producto", error);
+    if (error.code == 11000) {
+      return FAIL("Clave repetida, no se puede modificar el producto", error);
+    } else {
+      return FAIL("No se pudo agregar el proudcto, error en el servidor",error);
+    }
   }
 };
 
@@ -191,8 +222,11 @@ export const putProdServSubdocument = async (
 
     return OK("Subdocumento modificado con éxito", updatedSectionProdServ);
   } catch (error) {
-    console.error(error);
-    return FAIL("Error al modificar el subdocumento", error);
+    if (error.code == 11000) {
+      return FAIL("Clave repetida, no se puede modificar el subdocumento", error);
+    } else {
+      return FAIL("Error al modificar el subdocumento",error);
+    }
   }
 };
 
@@ -212,7 +246,12 @@ export const putPrimaryPresentacion = async (id, idPresentacion, data) => {
     }, {new: true});
     return OK("Presentación actualizada con éxito", updatedPresentacion)
   } catch (error) {
-    return FAIL("No se pudo actualizar la presentación", error)
+    if (error.code == 11000) {
+      return FAIL("Clave duplicada, no se pudo actualizar la presentación", error);
+    } else {
+      console.log(error)
+      return FAIL("No se pudo actualizar la presentación", error)
+    }
   }
 }
 
@@ -266,8 +305,12 @@ export const putPresentacionSubdocument = async (id, idPresentacion, seccionPres
 
     return OK("Subdocumento modificado con éxito", updatedSeccion);
   } catch (error) {
-    console.error(error);
-    return FAIL("Error al modificar el subdocumento", error);
+    if (error.code == 11000) {
+      return FAIL("Clave duplicada, no se pudo actualizar el subdocumento", error);
+    } else {
+      console.error(error);
+      return FAIL("Error al modificar el subdocumento", error);
+    }     
   }
 };
 
