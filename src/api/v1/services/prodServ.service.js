@@ -68,6 +68,7 @@ export const addSubdocumentProdServ = async (id, seccion, newSubDocument) => {
   if (!allowedSections.includes(seccion)) {
     return FAIL("Sección inválida");
   }
+
   try {
 
     //Primero verficamos que el subodc que intentamos añadir no exista ya en la bd
@@ -86,6 +87,24 @@ export const addSubdocumentProdServ = async (id, seccion, newSubDocument) => {
       return FAIL("id duplicado, no se realizó la inserción");
     }
     //---Fin de la verificación de id duplicada----
+
+    //Si la sección es estatus cambia el cambio ACTUAL a 'N'
+    if ( seccion === "estatus"){
+
+      let arrayFilters = [
+        { "estatus.Actual": { $eq: 'S' } } 
+      ]
+      const campo = 'estatus.$[estatus].Actual';
+
+      const cambiarActual = await ProdServ.findOneAndUpdate(
+        { IdProdServOK: id }, // Busqueda por el IdProdServOK
+        { $set: { [campo]: 'N' } }, 
+        { 
+          arrayFilters,
+          new: true 
+        } 
+      );
+    }
 
     // $push para añadir el nuevo subdocumento al arreglo
     const updatedProdServ = await ProdServ.findOneAndUpdate(
@@ -117,6 +136,31 @@ export const addPresentacionSubdocument = async (id, idPresentacion, seccionPres
     IdProdServOK: id,
     "presentaciones.IdPresentaOK": idPresentacion
   };
+
+  //Cambiar todos los estatus.Actual a N
+  if (seccionPresentacion === "estatus" && newPresentacionSubdocument.Actual === "S"){
+    let arrayFilters = [
+      { "presentacion.IdPresentaOK": idPresentacion }, 
+      { "subdocument.Actual": { $eq: 'S' } } 
+    ]
+    try {
+      
+      const campoActual = `presentaciones.$[presentacion].${seccionPresentacion}.$[subdocument].Actual`;
+      const updatedActual = await ProdServ.findOneAndUpdate(
+        query,
+        { $set: { [campoActual]: 'N' } },
+        {
+          arrayFilters,
+          new: true,
+        }
+      );
+
+    } catch (error) {
+        console.error(error);
+        return FAIL("Error al modificar el campo ACTUAL", error);
+    }
+
+  }
 
   // Define el path de la sección a actualizar
   const pathToAdd = `presentaciones.$.${seccionPresentacion}`;
@@ -190,12 +234,7 @@ export const putPrimaryProdServ = async (id, data) => {
 
 //----------PUT SUBDOCUMENTOS----------
 //Método para modificar un subdocumento
-export const putProdServSubdocument = async (
-  id,
-  seccion,
-  idSeccion,
-  updatedSubdocument
-) => {
+export const putProdServSubdocument = async ( id, seccion, idSeccion, updatedSubdocument) => {
   const allowedSections = ["estatus", "presentaciones", "info_ad"];
   if (!allowedSections.includes(seccion)) {
     return FAIL("Sección inválida");
@@ -210,6 +249,25 @@ export const putProdServSubdocument = async (
   }
 
   try {
+
+    //Si la sección es estatus cambia el cambio ACTUAL a 'N'
+    if ( seccion === "estatus" && updatedSubdocument.Actual === "S"){
+
+      let arrayFilters = [
+        { "estatus.Actual": { $eq: 'S' } } 
+      ]
+      const campo = 'estatus.$[estatus].Actual';
+
+      const cambiarActual = await ProdServ.findOneAndUpdate(
+        { IdProdServOK: id }, // Busqueda por el IdProdServOK
+        { $set: { [campo]: 'N' } }, 
+        { 
+          arrayFilters,
+          new: true 
+        } 
+      );
+    }
+
     const updatedSectionProdServ = await ProdServ.findOneAndUpdate(
       query,
       { $set: { [`${seccion}.$`]: updatedSubdocument } },
@@ -268,6 +326,31 @@ export const putPresentacionSubdocument = async (id, idPresentacion, seccionPres
     "presentaciones.IdPresentaOK": idPresentacion
   };
 
+  //Cambiar todos los estatus.Actual a N
+  if (seccionPresentacion === "estatus" && data.Actual === "S"){
+    let arrayFilters = [
+      { "presentacion.IdPresentaOK": idPresentacion }, 
+      { "subdocument.Actual": { $eq: 'S' } } 
+    ]
+    try {
+      
+      const campoActual = `presentaciones.$[presentacion].${seccionPresentacion}.$[subdocument].Actual`;
+      const updatedActual = await ProdServ.findOneAndUpdate(
+        query,
+        { $set: { [campoActual]: 'N' } },
+        {
+          arrayFilters,
+          new: true,
+        }
+      );
+
+    } catch (error) {
+        console.error(error);
+        return FAIL("Error al modificar el campo ACTUAL", error);
+    }
+
+  }
+
   // Define el path para la sección específica dentro de `presentaciones`
   const pathToUpdate = `presentaciones.$[presentacion].${seccionPresentacion}.$[subdocument]`;
 
@@ -289,6 +372,7 @@ export const putPresentacionSubdocument = async (id, idPresentacion, seccionPres
     { "presentacion.IdPresentaOK": idPresentacion },
     { [`subdocument.IdArchivoOK`]: idSeccionPresentacion }
   ];
+
   try {
     const updatedSeccion = await ProdServ.findOneAndUpdate(
       query,
